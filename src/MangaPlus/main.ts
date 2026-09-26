@@ -123,53 +123,13 @@ export class MangaPlusExtension implements ExtensionImpl<typeof MangaPlusConfig>
     };
   }
 
-  async getFeaturedTitles(): Promise<PagedResults<SearchResultItem>> {
-    const request = {
-      url: `${API_URL}/featuredV2?lang=eng&clang=eng&format=json`,
-      method: "GET",
-    };
-
-    const response = (await Application.scheduleRequest(request))[1];
-    const result = JSON.parse(Application.arrayBufferToUTF8String(response)) as MangaPlusResponse;
-
-    if (result.success === undefined) {
-      throw new Error(langPopup(result.error, Language.ENGLISH)?.body ?? "Unknown error");
-    }
-
-    const languages = getLanguages();
-
-    const results = result.success?.featuredTitlesViewV2?.contents
-      ?.find((x) => x.titleList && x.titleList.listName == "WEEKLY SHONEN JUMP")
-      ?.titleList.featuredTitles.filter((title) =>
-        languages.includes(title.language ?? Language.ENGLISH),
-      );
-
-    const titles: SearchResultItem[] = [];
-    const collectedIds: string[] = [];
-
-    for (const item of results ?? []) {
-      const mangaId = item.titleId.toString();
-      const title = item.name;
-      const author = item.author;
-      const image = item.portraitImageUrl;
-
-      if (!mangaId || !title || collectedIds.includes(mangaId)) continue;
-
-      titles.push({
-        mangaId: mangaId,
-        title: title,
-        subtitle: author,
-        imageUrl: image,
-        contentRating: ContentRating.EVERYONE,
-      });
-    }
-
-    return { items: titles };
+    async getFeaturedTitles(): Promise<PagedResults<SearchResultItem>> {
+    return this.getPopularTitles();
   }
 
   async getPopularTitles(): Promise<PagedResults<SearchResultItem>> {
     const request = {
-      url: `${API_URL}/title_list/ranking?format=json`,
+      url: `${API_URL}/title_list/rankingV2?lang=eng&type=hottest&clang=eng&format=json`,
       method: "GET",
     };
 
@@ -182,9 +142,11 @@ export class MangaPlusExtension implements ExtensionImpl<typeof MangaPlusConfig>
 
     const languages = getLanguages();
 
-    const results = result.success?.titleRankingView?.titles.filter((title) =>
-      languages.includes(title.language ?? Language.ENGLISH),
-    );
+    const results = result.success?.titleRankingView?.rankedTitles
+  ?.flatMap((group) => group.titles)
+  .filter((title) =>
+    languages.includes(title.language ?? Language.ENGLISH),
+  );
 
     const titles: SearchResultItem[] = [];
     const collectedIds: string[] = [];
@@ -211,7 +173,7 @@ export class MangaPlusExtension implements ExtensionImpl<typeof MangaPlusConfig>
 
   async getLatestUpdates(): Promise<PagedResults<SearchResultItem>> {
     const request = {
-      url: `${API_URL}/web/web_homeV4?lang=eng&format=json`,
+      url: `${API_URL}/web/web_homeV4?lang=eng&clang=eng&format=json`,
       method: "GET",
     };
 
@@ -225,10 +187,10 @@ export class MangaPlusExtension implements ExtensionImpl<typeof MangaPlusConfig>
     const languages = getLanguages();
 
     const results = result.success.webHomeViewV4?.groups
-      .flatMap((ex) => ex.titleGroups)
-      .flatMap((ex) => ex.titles)
-      .map((title) => title.title)
-      .filter((title) => languages.includes(title.language ?? Language.ENGLISH));
+  .flatMap((group) => group.titles)
+  .map((entry) => entry.latestChapter?.title)
+  .filter((title) => title !== undefined)
+  .filter((title) => languages.includes(title.language ?? Language.ENGLISH));
 
     const titles: SearchResultItem[] = [];
     const collectedIds: string[] = [];
@@ -260,7 +222,7 @@ export class MangaPlusExtension implements ExtensionImpl<typeof MangaPlusConfig>
     const title = query.title ?? "";
 
     const request = {
-      url: `${API_URL}/title_list/allV2?format=JSON&${title ? "filter=" + encodeURI(title) + "&" : ""}format=json`,
+      url: `${API_URL}/title_list/all_v3?type=serializing&lang=eng&clang=eng&format=json`,
       method: "GET",
     };
 
@@ -274,12 +236,16 @@ export class MangaPlusExtension implements ExtensionImpl<typeof MangaPlusConfig>
     const ltitle = query.title?.toLowerCase() ?? "";
     const languages = getLanguages();
 
-    const results = result.success?.allTitlesViewV2?.AllTitlesGroup.flatMap((group) => group.titles)
-      .filter((title) => languages.includes(title.language ?? Language.ENGLISH))
-      .filter(
-        (title) =>
-          title.author?.toLowerCase().includes(ltitle) || title.name.toLowerCase().includes(ltitle),
-      );
+    const results = result.success?.allTitlesViewV3?.titles
+  .map((entry) => entry.title)
+  .filter((title) =>
+    languages.includes(title.language ?? Language.ENGLISH),
+  )
+  .filter(
+    (title) =>
+      title.name.toLowerCase().includes(ltitle ?? "") ||
+      title.author?.toLowerCase().includes(ltitle ?? ""),
+  );
 
     const titles: SearchResultItem[] = [];
     const collectedIds: string[] = [];
