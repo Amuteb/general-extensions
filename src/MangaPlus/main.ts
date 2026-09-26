@@ -134,7 +134,8 @@ export class MangaPlusExtension implements ExtensionImpl<typeof MangaPlusConfig>
     };
 
     const response = (await Application.scheduleRequest(request))[1];
-    const result = JSON.parse(Application.arrayBufferToUTF8String(response.data));
+    const rawResponse = Application.arrayBufferToUTF8String(response.data);
+throw new Error(rawResponse.substring(0, 500));
 
     if (result.success === undefined) {
       throw new Error(langPopup(result.error, Language.ENGLISH)?.body ?? "Unknown error");
