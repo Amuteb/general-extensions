@@ -129,7 +129,7 @@ export class MangaPlusExtension implements ExtensionImpl<typeof MangaPlusConfig>
 
   async getPopularTitles(): Promise<PagedResults<SearchResultItem>> {
     const request = {
-      url: `${API_URL}/title_list/rankingV2?lang=eng&type=hottest&clang=eng&format=json`,
+      url: `${API_URL}/title_list/allV2?lang=eng&format=json`,
       method: "GET",
     };
 
