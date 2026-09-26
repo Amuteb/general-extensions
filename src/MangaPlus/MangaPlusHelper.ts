@@ -22,7 +22,7 @@ interface SuccessResult {
   titleRankingView?: TitleRankingView;
   titleDetailView?: TitleDetailView;
   mangaViewer?: MangaViewer;
-  allTitlesViewV2?: AllTitlesViewV2;
+  allTitlesViewV3?: AllTitlesViewV3;
   webHomeViewV4?: WebHomeViewV4;
   featuredTitlesViewV2?: {
     contents: [
@@ -42,34 +42,27 @@ interface SuccessResult {
 }
 
 interface TitleRankingView {
-  titles: Title[];
+  rankedTitles: {
+    titles: Title[];
+  }[];
 }
 
-interface AllTitlesViewV2 {
-  AllTitlesGroup: AllTitlesGroup[];
-}
-
-interface AllTitlesGroup {
-  theTitle: string;
-  titles: Title[];
+interface AllTitlesViewV3 {
+  titles: {
+    title: Title;
+  }[];
 }
 
 interface WebHomeViewV4 {
-  groups: UpdatedTitleV2Group[];
-}
-
-interface UpdatedTitleV2Group {
-  groupName: string;
-  titleGroups: OriginalTitleGroup[];
-}
-
-interface OriginalTitleGroup {
-  theTitle: string;
-  titles: UpdatedTitle[];
+  groups: {
+    titles: UpdatedTitle[];
+  }[];
 }
 
 interface UpdatedTitle {
-  title: Title;
+  latestChapter?: {
+    title?: Title;
+  };
 }
 
 class ErrorResult {
