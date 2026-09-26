@@ -129,7 +129,7 @@ export class MangaPlusExtension implements ExtensionImpl<typeof MangaPlusConfig>
 
   async getPopularTitles(): Promise<PagedResults<SearchResultItem>> {
     const request = {
-      url: `${API_URL}/title_list/allV2?lang=eng&format=json`,
+      url: `${API_URL}/title_list/rankingV2?lang=eng&type=hottest&clang=eng`,
       method: "GET",
     };
 
@@ -173,7 +173,7 @@ export class MangaPlusExtension implements ExtensionImpl<typeof MangaPlusConfig>
 
   async getLatestUpdates(): Promise<PagedResults<SearchResultItem>> {
     const request = {
-      url: `${API_URL}/web/web_homeV4?lang=eng&clang=eng&format=json`,
+      url: `${API_URL}/web/web_homeV4?lang=eng&clang=eng`,
       method: "GET",
     };
 
@@ -222,7 +222,7 @@ export class MangaPlusExtension implements ExtensionImpl<typeof MangaPlusConfig>
     const title = query.title ?? "";
 
     const request = {
-      url: `${API_URL}/title_list/all_v3?type=serializing&lang=eng&clang=eng&format=json`,
+      url: `${API_URL}/title_list/all_v3?type=serializing&lang=eng&clang=eng`,
       method: "GET",
     };
 
