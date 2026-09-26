@@ -289,11 +289,9 @@ export class MangaPlusExtension implements ExtensionImpl<typeof MangaPlusConfig>
   async interceptRequest(request: Request): Promise<Request> {
     request.headers = {
   ...request.headers,
-  Accept: "application/json, text/plain, */*",
-  "Accept-Language": "en-US,en;q=0.9",
   Origin: BASE_URL,
   Referer: `${BASE_URL}/`,
-  "Session-Token": this.getSessionToken(),
+  "session-token": this.getSessionToken(),
   "user-agent": await Application.getDefaultUserAgent(),
 };
 
