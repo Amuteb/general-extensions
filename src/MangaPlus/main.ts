@@ -61,7 +61,7 @@ export class MangaPlusExtension implements ExtensionImpl<typeof MangaPlusConfig>
 
   async getMangaDetails(mangaId: string): Promise<SourceManga> {
     const request = {
-      url: `${API_URL}/title_detailV3?title_id=${mangaId}&format=json`,
+      url: `${API_URL}/title_detailV3?title_id=${mangaId}&clang=eng&format=json`,
       method: "GET",
     };
 
@@ -73,7 +73,7 @@ export class MangaPlusExtension implements ExtensionImpl<typeof MangaPlusConfig>
 
   private async getThumbnailUrl(mangaId: string): Promise<string> {
     const request = {
-      url: `${API_URL}/title_detailV3?title_id=${mangaId}&format=json`,
+      url: `${API_URL}/title_detailV3?title_id=${mangaId}&clang=eng&format=json`,
       method: "GET",
     };
 
@@ -85,7 +85,7 @@ export class MangaPlusExtension implements ExtensionImpl<typeof MangaPlusConfig>
 
   async getChapters(sourceManga: SourceManga): Promise<Chapter[]> {
     const request = {
-      url: `${API_URL}/title_detailV3?title_id=${sourceManga.mangaId}&format=json`,
+      url: `${API_URL}/title_detailV3?title_id=${sourceManga.mangaId}&clang=eng&format=json`,
       method: "GET",
     };
 
@@ -100,7 +100,7 @@ export class MangaPlusExtension implements ExtensionImpl<typeof MangaPlusConfig>
 
   async getChapterDetails(chapter: Chapter): Promise<ChapterDetails> {
     const request = {
-      url: `${API_URL}/manga_viewer?chapter_id=${chapter.chapterId}&split=${getSplitImages()}&img_quality=${getResolution()}&format=json`,
+      url: `${API_URL}/manga_viewer_v3?chapter_id=${chapter.chapterId}&split=${getSplitImages()}&img_quality=${getResolution()}&clang=eng&format=json`,
       method: "GET",
     };
 
@@ -288,12 +288,14 @@ export class MangaPlusExtension implements ExtensionImpl<typeof MangaPlusConfig>
 
   async interceptRequest(request: Request): Promise<Request> {
     request.headers = {
-      ...request.headers,
-      Origin: BASE_URL,
-      Referer: `${BASE_URL}/`,
-      "session-token": this.getSessionToken(),
-      "user-agent": await Application.getDefaultUserAgent(),
-    };
+  ...request.headers,
+  Accept: "application/json, text/plain, */*",
+  "Accept-Language": "en-US,en;q=0.9",
+  Origin: BASE_URL,
+  Referer: `${BASE_URL}/`,
+  "Session-Token": this.getSessionToken(),
+  "user-agent": await Application.getDefaultUserAgent(),
+};
 
     if (request.url.startsWith("imageMangaId=")) {
       const mangaId = request.url.replace("imageMangaId=", "");
